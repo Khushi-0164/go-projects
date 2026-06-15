@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
 type Note struct {
@@ -86,6 +87,41 @@ func DeleteNotes(notes []Note, id int) []Note {
 	return notes
 
 }
+
+func UpdateNotes(notes []Note, id int, title string, body string) []Note {
+	if len(notes) == 0 {
+		fmt.Println("No notes found")
+		return []Note{}
+	}
+	for i, note := range notes {
+		if note.ID == id {
+			notes[i].Title = title
+			notes[i].Body = body
+			fmt.Println("Notes updated")
+			return notes
+		}
+	}
+
+	fmt.Println("Notes not found")
+	return notes
+
+}
+
+func SearchNotes(notes []Note, keyword string) []Note {
+	if len(notes) == 0 {
+		fmt.Println("No notes found")
+		return []Note{}
+	}
+	for _, note := range notes {
+		if strings.Contains(note.Title, keyword) ||
+			strings.Contains(note.Body, keyword) {
+
+			fmt.Println(note.ID, note.Title, note.Body)
+		}
+	}
+	return notes
+}
+
 func main() {
 	notes, err := LoadNotes()
 	if err != nil {
@@ -128,6 +164,28 @@ func main() {
 			return
 		}
 		notes = DeleteNotes(notes, id)
+
+	case "update":
+		if len(os.Args) < 5 {
+			fmt.Println("Usage: go run main.go update <id><title><body>")
+			return
+		}
+		id, err := strconv.Atoi(os.Args[2])
+		if err != nil {
+			fmt.Println("Invalid Id")
+			return
+		}
+		title := os.Args[3]
+		body := os.Args[4]
+		notes = UpdateNotes(notes, id, title, body)
+
+	case "search":
+		if len(os.Args) < 3 {
+			fmt.Println("Usage: go run main.go search <title>")
+			return
+		}
+		keyword := os.Args[2]
+		notes = SearchNotes(notes, keyword)
 
 	default:
 		fmt.Println("Invalid command")
