@@ -1,0 +1,8 @@
+INFO server started
+INFO user login
+INFO fetch data
+WARN slow query detected
+ERROR database down
+ERROR retry failed
+INFO request completed
+WARN high CPU usage
