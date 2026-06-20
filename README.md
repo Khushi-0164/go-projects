@@ -1,30 +1,39 @@
-# 🚀 Go Projects Portfolio
+# Go Projects
 
-This repository contains my Go learning projects.
+A collection of Go projects focused on backend development, problem solving, and software engineering fundamentals.
 
-## 📁 Projects
+## Projects
 
-### 🧮 Calculator CLI
-- Add, Subtract, Multiply, Divide using command line
+* Calculator
+* Age Calculator
+* Number Guessing Game
+* Temperature Converter
+* Todo CLI
+* Expense Tracker
+* Notes CLI
+* Student Management System
+* File Analyzer
+* Log Analyzer
+* File Health Checker
+* URL Health Checker
+* Password Hasher
+* Todo REST API
+* Todo API (Gin Framework)
 
-### 🎮 Number Game
-- Guess the random number game
+## Technologies
 
-### 📝 Todo API (net/http)
-- Basic REST API using standard library
+* Go
+* JSON
+* HTTP
+* REST APIs
+* File Handling
+* CLI Applications
+* Git & GitHub
 
-### ⚡ Todo API (Gin)
-- REST API using Gin framework
+## Repository Structure
 
----
+Each project resides in its own directory and includes a dedicated README with setup instructions, features, and implementation details.
 
-## 🛠 Tech Stack
-- Go (Golang)
-- CLI Applications
-- REST APIs
-- Gin Framework
+## Purpose
 
----
-
-## 🎯 Purpose
-This repo is my Go backend learning journey.
+This repository showcases practical Go projects built to strengthen backend development, problem-solving, and software engineering skills.
