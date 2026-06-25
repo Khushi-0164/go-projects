@@ -1,0 +1,32 @@
+[
+  {
+    "url": "https://github.com",
+    "status_code": 200,
+    "response_time": "225.857917ms",
+    "error": ""
+  },
+  {
+    "url": "https://stackoverflow.com",
+    "status_code": 403,
+    "response_time": "265.375459ms",
+    "error": ""
+  },
+  {
+    "url": "https://google.com",
+    "status_code": 200,
+    "response_time": "541.16925ms",
+    "error": ""
+  },
+  {
+    "url": "https://youtube.com",
+    "status_code": 200,
+    "response_time": "551.155ms",
+    "error": ""
+  },
+  {
+    "url": "https://golang.org",
+    "status_code": 200,
+    "response_time": "1.515198666s",
+    "error": ""
+  }
+]
