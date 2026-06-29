@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strings"
 )
 
 func StartClient() {
-	// Connect to server
+	// Connect to the server
 	conn, err := net.Dial("tcp", "localhost:8080")
 	if err != nil {
 		fmt.Println("Error connecting:", err)
@@ -18,29 +19,38 @@ func StartClient() {
 
 	fmt.Println("Connected to server")
 
-	// Read username
 	scanner := bufio.NewScanner(os.Stdin)
 
+	// Read username
 	fmt.Print("Enter your username: ")
 	scanner.Scan()
-	username := scanner.Text()
+	username := strings.TrimSpace(scanner.Text())
 
-	// Send username to server
+	if username == "" {
+		fmt.Println("Username cannot be empty.")
+		return
+	}
+
+	// Send username to the server
 	_, err = conn.Write([]byte(username))
 	if err != nil {
 		fmt.Println("Error sending username:", err)
 		return
 	}
 
-	// Start receiving messages
+	// Goroutine to receive messages
 	go receiveMessages(conn)
 
 	fmt.Println("You can start chatting!")
 	fmt.Println("Type your message and press Enter.")
 
-	// Read chat messages
+	// Read and send messages
 	for scanner.Scan() {
-		message := scanner.Text()
+		message := strings.TrimSpace(scanner.Text())
+
+		if message == "" {
+			continue
+		}
 
 		_, err := conn.Write([]byte(message))
 		if err != nil {

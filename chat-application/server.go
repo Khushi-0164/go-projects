@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+	"strings"
 	"sync"
 )
 
@@ -35,15 +36,15 @@ func StartServer() {
 func handleClient(conn net.Conn) {
 	defer conn.Close()
 
-	// Read username
 	buffer := make([]byte, 1024)
 
+	// Read username
 	n, err := conn.Read(buffer)
 	if err != nil {
 		return
 	}
 
-	username := string(buffer[:n])
+	username := strings.TrimSpace(string(buffer[:n]))
 
 	// Store client
 	mutex.Lock()
@@ -58,12 +59,18 @@ func handleClient(conn net.Conn) {
 		n, err := conn.Read(buffer)
 		if err != nil {
 			fmt.Printf("%s left the chat\n", username)
+
 			removeClient(conn)
-			broadcast(fmt.Sprintf("%s joined the chat\n", username), conn)
+
+			broadcast(fmt.Sprintf("%s left the chat\n", username), conn)
 			return
 		}
 
-		message := fmt.Sprintf("%s: %s", username, string(buffer[:n]))
+		message := fmt.Sprintf(
+			"%s: %s\n",
+			username,
+			strings.TrimSpace(string(buffer[:n])),
+		)
 
 		fmt.Print(message)
 		broadcast(message, conn)
@@ -76,7 +83,7 @@ func broadcast(message string, sender net.Conn) {
 
 	for conn := range clients {
 		if conn == sender {
-			continue // Don't send back to sender
+			continue
 		}
 
 		_, err := conn.Write([]byte(message))
