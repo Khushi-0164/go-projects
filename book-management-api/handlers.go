@@ -39,12 +39,32 @@ func booksHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getBooks(w http.ResponseWriter, r *http.Request) {
+	rows, err := db.Query("SELECT id, title, author FROM books")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	var books []Book
+
+	for rows.Next() {
+		var book Book
+
+		err := rows.Scan(&book.ID, &book.Title, &book.Author)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		books = append(books, book)
+	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(books)
 }
 
 func addBook(w http.ResponseWriter, r *http.Request) {
-
+	w.Header().Set("Content-Type", "application/json")
 	var newBook Book
 
 	err := json.NewDecoder(r.Body).Decode(&newBook)
@@ -53,11 +73,18 @@ func addBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	books = append(books, newBook)
+	err = db.QueryRow(
+		"INSERT INTO books (title,author) VALUES ($1,$2) RETURNING id",
+		newBook.Title,
+		newBook.Author,
+	).Scan(&newBook.ID)
 
-	w.Header().Set("Content-Type", "application/json")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
-
 	json.NewEncoder(w).Encode(newBook)
 }
 
@@ -71,15 +98,19 @@ func getBookByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, book := range books {
-		if book.ID == id {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(book)
-			return
-		}
+	var book Book
+	err = db.QueryRow(
+		"SELECT id,title,author FROM books WHERE id=$1",
+		id,
+	).Scan(&book.ID, &book.Title, &book.Author)
+
+	if err != nil {
+		http.Error(w, "Book not found", http.StatusNotFound)
+		return
 	}
 
-	http.Error(w, "Book not found", http.StatusNotFound)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(book)
 }
 
 func deleteBook(w http.ResponseWriter, r *http.Request) {
@@ -92,17 +123,22 @@ func deleteBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for i, book := range books {
-		if book.ID == id {
-
-			books = append(books[:i], books[i+1:]...)
-
-			w.WriteHeader(http.StatusNoContent)
-			return
-		}
+	result, err := db.Exec(
+		"DELETE FROM books WHERE id=$1",
+		id,
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	http.Error(w, "Book not found", http.StatusNotFound)
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		http.Error(w, "Book not found", http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func updateBook(w http.ResponseWriter, r *http.Request) {
@@ -123,17 +159,26 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for i, book := range books {
-		if book.ID == id {
-
-			books[i].Title = updatedBook.Title
-			books[i].Author = updatedBook.Author
-
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(books[i])
-			return
-		}
+	result, err := db.Exec(
+		"UPDATE books SET title=$1,author=$2 WHERE id=$3",
+		updatedBook.Title,
+		updatedBook.Author,
+		id,
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	http.Error(w, "Book not found", http.StatusNotFound)
+	rowAffected, _ := result.RowsAffected()
+
+	if rowAffected == 0 {
+		http.Error(w, "Book not found", http.StatusNotFound)
+		return
+	}
+	updatedBook.ID = id
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(updatedBook)
+
 }
