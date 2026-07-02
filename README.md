@@ -13,6 +13,7 @@ Here is a categorized map of the projects in this repository:
 *   **[Number Guessing Game](./numGame)**: Interactive guess validation against a randomly generated secret seed.
 *   **[Temperature Converter CLI](./temp-cli)**: Decimal conversions between Celsius and Fahrenheit.
 *   **[Age Calculator](./Age-calculator)**: Exact age breakdown in years, months, and days using the standard `time` package.
+*   **[Tic-Tac-Toe Game](./tic-tac-toe)**: Interactive console board game with multiplayer logic and win/draw validation.
 
 ### 2. 💾 Persistent Data & File Systems
 *   **[Todo List CLI](./todo-CLI)**: Task CRUD management utilizing local JSON storage.
@@ -20,16 +21,22 @@ Here is a categorized map of the projects in this repository:
 *   **[Expense Tracker CLI](./expense-tracker)**: Spend logging featuring total spend aggregations and formatted outputs.
 *   **[File Analyzer](./file-analyzer)**: Calculates lines, words, and characters inside a target text file.
 *   **[Log Analyzer CLI](./log-analyzer)**: Filters and tallies logs line-by-line based on `INFO`, `WARN`, and `ERROR` classifications.
+*   **[Duplicate File Finder](./duplicate-file-finder)**: Recursively scans directories to detect and group duplicate files based on content SHA-256 hashes.
 
 ### 3. 🧩 Architecture, Concurrency & Security
 *   **[Student Management System](./student-management)**: Modularized structure containing storage layers and services, mutating slice elements in-place via pointer receivers.
 *   **[Concurrent File Health Checker](./file-health-checker)**: Checks multiple local file states concurrently using Goroutines and WaitGroups.
 *   **[Concurrent URL Health Checker](./url-health-checker)**: Pings multiple web addresses concurrently, measuring latencies and catching timeouts.
 *   **[Secure Password Hasher CLI](./password-hasher)**: Secure keyboard input masking using `golang.org/x/term` and constant-time password verification via `bcrypt`.
+*   **[Concurrent Web Scraper](./concurrent-web-scraper)**: Downloads and processes lists of URLs using a multi-worker pool pattern and outputs status reports to JSON.
+*   **[Console TCP Chat Application](./chat-application)**: Multi-client real-time chat application over TCP sockets with mutex-safe synchronization.
+*   **[GitHub Profile Finder](./github-profile-finder)**: Queries public user details and repository statistics using the GitHub REST API.
 
 ### 4. 🔌 Web Routing & REST APIs
 *   **[Todo REST API (Standard Library)](./todo-api)**: A REST API built purely with standard libraries (`net/http`) featuring manual route parsing.
 *   **[Todo REST API (Gin Framework)](./todo-gin)**: Migrated REST endpoints utilizing Gin for route queries, JSON parameter binding, and response builders.
+*   **[URL Shortener Service](./url-shortener)**: In-memory short-code generation API with automated HTTP redirections.
+*   **[Book Management REST API](./book-management-api)**: REST API utilizing PostgreSQL for persistent storage of book records.
 
 ---
 
