@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"blog-api/database"
+	"blog-api/routes"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,11 +16,7 @@ func main() {
 
 	router := gin.Default()
 
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Blog API is running!",
-		})
-	})
+	routes.SetupRoutes(router)
 
 	router.Run(":8080")
 }
