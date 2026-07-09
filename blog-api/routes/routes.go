@@ -18,6 +18,6 @@ func SetupRoutes(router *gin.Engine) {
 	protected.Use(middleware.AuthMiddleware())
 
 	protected.POST("/blogs", handlers.CreateBlog)
-	//protected.PUT("/blogs/:id", handlers.UpdateBlog)
-	//protected.DELETE("/blogs/:id", handlers.DeleteBlog)
+	protected.PUT("/blogs/:id", handlers.UpdateBlog)
+	protected.DELETE("/blogs/:id", handlers.DeleteBlog)
 }
