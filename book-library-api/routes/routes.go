@@ -12,5 +12,5 @@ func SetupRoutes(router *gin.Engine) {
 	router.GET("/books/:id", handlers.GetBookByID)
 	router.PUT("/books/:id", handlers.UpdateBook)
 	router.DELETE("/books/:id", handlers.DeleteBook)
-	router.GET("/books/search", handlers.searchBooks)
+	router.GET("/books/search", handlers.SearchBooks)
 }

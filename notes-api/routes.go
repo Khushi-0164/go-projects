@@ -7,4 +7,6 @@ func setUpRoutes(router *gin.Engine) {
 	router.POST("/notes", createNoteHandler)
 	router.GET("/notes", getAllNotesHandler)
 	router.GET("/notes/:id", getNoteByIDHandler)
+	router.PUT("/notes/:id", updateNoteByIDHandler)
+	router.DELETE("/notes/:id", deleteNoteByIDHandler)
 }
