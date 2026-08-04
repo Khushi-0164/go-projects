@@ -1,0 +1,31 @@
+package main
+
+import (
+	"log"
+	"url-shortener/config"
+	"url-shortener/internal/models"
+	"url-shortener/internal/routes"
+
+	"github.com/joho/godotenv"
+)
+
+func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, relying on system environment variables")
+	}
+
+	db := config.ConnectDB()
+
+	// Auto-migrate models -> tables
+	if err := db.AutoMigrate(&models.User{}, &models.Link{}); err != nil {
+		log.Fatalf("failed to migrate database: %v", err)
+	}
+
+	router := routes.SetupRouter(db)
+
+	port := config.GetEnv("PORT", "8080")
+	log.Printf("Server starting on :%s", port)
+	if err := router.Run(":" + port); err != nil {
+		log.Fatalf("failed to start server: %v", err)
+	}
+}
