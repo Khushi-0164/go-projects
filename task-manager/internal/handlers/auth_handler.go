@@ -1,24 +1,20 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
-	"task-manager/config"
-	"task-manager/internal/middleware"
-	"task-manager/internal/models"
-	"task-manager/internal/utils"
-	"time"
+
+	"task-manager/internal/service"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
-	"gorm.io/gorm"
 )
 
 type AuthHandler struct {
-	DB *gorm.DB
+	service *service.AuthService
 }
 
-func NewAuthHandler(db *gorm.DB) *AuthHandler {
-	return &AuthHandler{DB: db}
+func NewAuthHandler(s *service.AuthService) *AuthHandler {
+	return &AuthHandler{service: s}
 }
 
 type signupRequest struct {
@@ -39,30 +35,20 @@ func (h *AuthHandler) Signup(c *gin.Context) {
 		return
 	}
 
-	var existing models.User
-	if err := h.DB.Where("email=?", req.Email).First(&existing).Error; err == nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "email already registered"})
-		return
-	}
-
-	hash, err := utils.HashPassword(req.Password)
+	user, err := h.service.Signup(req.Email, req.Name, req.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to hash password"})
-		return
-	}
-	users := models.User{
-		Email:        req.Email,
-		Name:         req.Name,
-		PasswordHash: hash,
-	}
-	if err := h.DB.Create(&users).Error; err != nil {
+		if errors.Is(err, service.ErrEmailTaken) {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create user"})
 		return
 	}
+
 	c.JSON(http.StatusCreated, gin.H{
-		"id":    users.ID,
-		"email": users.Email,
-		"name":  users.Name,
+		"id":    user.ID,
+		"email": user.Email,
+		"name":  user.Name,
 	})
 }
 
@@ -72,30 +58,15 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	var user models.User
-	if err := h.DB.Where("email=?", req.Email).First(&user).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
-		return
-	}
-	if !utils.CheckPasswordHash(req.Password, user.PasswordHash) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
-		return
-	}
-	claims := middleware.Claims{
-		UserID: user.ID,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-		},
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signed, err := token.SignedString(config.JWTSecret())
+
+	user, token, err := h.service.Login(req.Email, req.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to sign token"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"token": signed,
+		"token": token,
 		"user": gin.H{
 			"id":    user.ID,
 			"email": user.Email,
