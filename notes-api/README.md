@@ -1,30 +1,47 @@
-# 📓 Notes REST API (Gin & PostgreSQL)
-A RESTful HTTP API built using the Gin framework and PostgreSQL to perform CRUD operations on personal notes.
+# 📝 Notes API
+A RESTful API to manage text notes, supporting full CRUD operations (Create, Read, Update, Delete) using the Gin web framework and PostgreSQL for persistence.
 
 ## 🚀 Features
-* **Welcome Endpoint** (`GET /`)
-* **Create Note** (`POST /notes`)
-* **Get All Notes** (`GET /notes`)
-* **Get Note by ID** (`GET /notes/:id`)
-* **Update Note** (`PUT /notes/:id`)
-* **Delete Note** (`DELETE /notes/:id`)
+* Standard CRUD operations on notes (Title, Content).
+* Connects to a PostgreSQL database for persistent data storage.
+* Utilizes the Gin framework for routing and JSON parsing/binding.
 
 ## 🛠️ Go Concepts Demonstrated
-* **Gin Web Framework**: Utilizing Gin's context processing, JSON parameter binding, and response rendering helper functions.
-* **SQL Database Integration**: Establishing connection to PostgreSQL via `database/sql` and performing queries/executions.
-* **Structured Payload Handling**: Extracting payload structures and responding back with formatted JSON payloads.
+* **Web Framework Integration**: Utilizing Gin for clean HTTP routing, path parameters (`/notes/:id`), and response builders.
+* **SQL Database Access**: Running SQL queries (SELECT, INSERT, UPDATE, DELETE) using standard `database/sql` with PostgreSQL drivers.
+* **JSON Binding**: Automatic binding of JSON request bodies into Go structures using `c.ShouldBindJSON`.
+* **Resource Mapping**: Mapping HTTP methods (`GET`, `POST`, `PUT`, `DELETE`) to corresponding RESTful handlers.
 
 ## 📖 How to Run
-Ensure your PostgreSQL server is running and a database named `notesdb` exists, then:
-1. **Start the API server:**
-   ```bash
-   go run .
-   ```
-   *The server runs on `http://localhost:8080`.*
-2. **Test Endpoints (using curl or Postman):**
-   * **Welcome:** `curl http://localhost:8080/`
-   * **Create:** `curl -X POST -H "Content-Type: application/json" -d '{"title":"Meeting Notes","content":"Discuss project milestones"}' http://localhost:8080/notes`
-   * **Get All:** `curl http://localhost:8080/notes`
-   * **Get by ID:** `curl http://localhost:8080/notes/1`
-   * **Update:** `curl -X PUT -H "Content-Type: application/json" -d '{"title":"Meeting Notes (Updated)","content":"Discuss milestones and budget"}' http://localhost:8080/notes/1`
-   * **Delete:** `curl -X DELETE http://localhost:8080/notes/1`
+Ensure your PostgreSQL database `notesdb` is running, then start the server:
+```bash
+go run .
+```
+Example Output:
+```bash
+2026/08/18 11:47:50 Connected to PostgreSQL!
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+[GIN-debug] GET    /                         --> main.welcomeHandler (3 handlers)
+[GIN-debug] POST   /notes                    --> main.createNoteHandler (3 handlers)
+[GIN-debug] GET    /notes                    --> main.getAllNotesHandler (3 handlers)
+...
+[GIN-debug] Listening and serving HTTP on :8080
+```
+
+In another terminal, create a note:
+```bash
+curl -X POST http://localhost:8080/notes \
+  -H "Content-Type: application/json" \
+  -d '{"title": "My Note", "content": "This is a test note."}'
+```
+Example Output:
+```json
+{
+  "message": "Note created successfully",
+  "note": {
+    "id": 1,
+    "title": "My Note",
+    "content": "This is a test note."
+  }
+}
+```

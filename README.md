@@ -31,12 +31,22 @@ Here is a categorized map of the projects in this repository:
 *   **[Concurrent Web Scraper](./concurrent-web-scraper)**: Downloads and processes lists of URLs using a multi-worker pool pattern and outputs status reports to JSON.
 *   **[Console TCP Chat Application](./chat-application)**: Multi-client real-time chat application over TCP sockets with mutex-safe synchronization.
 *   **[GitHub Profile Finder](./github-profile-finder)**: Queries public user details and repository statistics using the GitHub REST API.
+*   **[Booking / Reservation API](./booking-api)**: Concurrency-safe overlap prevention with row locking, JWT, and layered architecture.
+*   **[Product Catalog API (Redis Cache-Aside)](./catalog-api)**: Product CRUD API demonstrating the cache-aside pattern with Redis in front of PostgreSQL and measured speedups.
+*   **[Real-Time Chat API (WebSockets)](./chat-api)**: WebSocket-based chat server featuring concurrent connection management with client read/write pumps.
+*   **[Task Manager API](./task-manager)**: REST API with per-project role-based access control, GORM transactions, and integration testing.
 
 ### 4. 🔌 Web Routing & REST APIs
 *   **[Todo REST API (Standard Library)](./todo-api)**: A REST API built purely with standard libraries (`net/http`) featuring manual route parsing.
 *   **[Todo REST API (Gin Framework)](./todo-gin)**: Migrated REST endpoints utilizing Gin for route queries, JSON parameter binding, and response builders.
 *   **[URL Shortener Service](./url-shortener)**: In-memory short-code generation API with automated HTTP redirections.
 *   **[Book Management REST API](./book-management-api)**: REST API utilizing PostgreSQL for persistent storage of book records.
+*   **[Blog REST API (Gin & PostgreSQL)](./blog-api)**: RESTful API using Gin and PostgreSQL with user authentication and JWT sessions.
+*   **[Book Library API (Gin & PostgreSQL)](./book-library-api)**: RESTful API supporting CRUD operations, GORM pagination, and text-based search.
+*   **[Bookmark REST API](./bookmark-api)**: Simple RESTful API for managing web bookmarks using Gin, GORM, and PostgreSQL.
+*   **[Habit Tracker API](./habit-tracker)**: REST API that lets users track daily habits, check in, and automatically calculates streaks/completion rates using Gin and GORM SQLite.
+*   **[Notes API (Gin & PostgreSQL)](./notes-api)**: RESTful note taking API featuring Gin routing and PostgreSQL integration.
+*   **[URL Shortener (Gin & GORM)](./url-shortner-gin)**: URL shortener featuring user ownership, JWT authentication, and redirection click analytics.
 
 ---
 
