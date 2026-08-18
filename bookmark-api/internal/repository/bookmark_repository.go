@@ -18,10 +18,27 @@ func (r *BookmarkRepository) Create(bookmark *models.Bookmark) error {
 	return r.DB.Create(bookmark).Error
 }
 
-func (r *BookmarkRepository) FindAll() ([]models.Bookmark, error) {
+func (r *BookmarkRepository) FindAll(page, limit int, tag string) ([]models.Bookmark, int64, error) {
 	var bookmarks []models.Bookmark
-	err := r.DB.Order("created_at desc").Find(&bookmarks).Error
-	return bookmarks, err
+	var total int64
+
+	query := r.DB.Model(&models.Bookmark{})
+	if tag != "" {
+		query = query.Where("tags LIKE ?", "%"+tag+"%")
+	}
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * limit
+	err := query.
+		Order("created_at desc").
+		Limit(limit).
+		Offset(offset).
+		Find(&bookmarks).Error
+
+	return bookmarks, total, err
 }
 
 func (r *BookmarkRepository) FindBtId(id uint) (*models.Bookmark, error) {

@@ -37,12 +37,29 @@ func (h *BookmarkHandler) Create(c *gin.Context) {
 }
 
 func (h *BookmarkHandler) List(c *gin.Context) {
-	bookmarks, err := h.service.List()
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil || page < 1 {
+		page = 1
+	}
+	limit, err := strconv.Atoi(c.DefaultQuery("limit", "5"))
+	if err != nil || limit < 1 || limit > 100 {
+		limit = 5
+	}
+	tag := c.Query("tag")
+
+	bookmarks, total, err := h.service.List(page, limit, tag)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch bookmarks"})
 		return
 	}
-	c.JSON(http.StatusOK, bookmarks)
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":        bookmarks,
+		"page":        page,
+		"limit":       limit,
+		"total":       total,
+		"total_pages": (total + int64(limit) - 1) / int64(limit),
+	})
 }
 
 func (h *BookmarkHandler) Delete(c *gin.Context) {

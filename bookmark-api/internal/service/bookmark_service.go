@@ -21,8 +21,8 @@ func (s *BookmarkService) Create(title, url, tags string) (*models.Bookmark, err
 	return bookmark, nil
 }
 
-func (s *BookmarkService) List() ([]models.Bookmark, error) {
-	return s.repo.FindAll()
+func (s *BookmarkService) List(page, limit int, tag string) ([]models.Bookmark, int64, error) {
+	return s.repo.FindAll(page, limit, tag)
 }
 
 func (s *BookmarkService) Delete(id uint) error {
