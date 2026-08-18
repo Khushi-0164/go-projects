@@ -13,7 +13,7 @@ import (
 func SetupRouter(db *gorm.DB) *gin.Engine {
 	router := gin.Default()
 	repo := repository.NewBookmarkRepository(db)
-	svc := service.NewBookingService(repo)
+	svc := service.NewBookmarkService(repo)
 	handler := handlers.NewBookingHandler(svc)
 
 	router.GET("/health", func(c *gin.Context) {

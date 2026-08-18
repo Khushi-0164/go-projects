@@ -4,26 +4,33 @@ import (
 	"bookmark-api/config"
 	"bookmark-api/internal/models"
 	"bookmark-api/internal/routes"
-	"log"
+	"log/slog"
+	"os"
 
 	"github.com/joho/godotenv"
 )
 
 func main() {
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+
 	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, relying on system environment variables")
+		slog.Warn("no .env file found, relying on system environment variables")
 	}
+
 	db := config.ConnectDB()
 
 	if err := db.AutoMigrate(&models.Bookmark{}); err != nil {
-		log.Fatalf("failed to migrate database: %v", err)
+		slog.Error("failed to migrate database", "error", err)
+		os.Exit(1)
 	}
 
 	router := routes.SetupRouter(db)
 
-	port := config.GetEnv("PORT", "8080")
-	log.Printf("Server starting on :%s", port)
+	port := config.Getenv("PORT", "8080")
+	slog.Info("server starting", "port", port)
 	if err := router.Run(":" + port); err != nil {
-		log.Fatalf("failed to start server: %v", err)
+		slog.Error("server failed to start", "error", err)
+		os.Exit(1)
 	}
 }

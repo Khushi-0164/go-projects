@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bookmark-api/internal/service"
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -25,14 +26,19 @@ type createBookmarkRequest struct {
 func (h *BookmarkHandler) Create(c *gin.Context) {
 	var req createBookmarkRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		slog.Warn("invalid create bookmark request", "error", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	bookmark, err := h.service.Create(req.Title, req.URL, req.Tags)
 	if err != nil {
+		slog.Error("failed to create bookmark", "error", err, "title", req.Title)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create bookmark"})
 		return
 	}
+
+	slog.Info("bookmark created", "bookmark_id", bookmark.ID, "title", bookmark.Title)
 	c.JSON(http.StatusCreated, bookmark)
 }
 

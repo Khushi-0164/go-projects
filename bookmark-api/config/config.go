@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 
 	"gorm.io/driver/postgres"
@@ -15,6 +15,13 @@ func GetEnv(key, fallback string) string {
 	}
 	return fallback
 }
+func Getenv(key, fallback string) string {
+	if val, ok := os.LookupEnv(key); ok && val != "" {
+		return val
+	}
+	return fallback
+}
+
 func ConnectDB() *gorm.DB {
 	dsn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
@@ -23,12 +30,13 @@ func ConnectDB() *gorm.DB {
 		GetEnv("DB_USER", "postgres"),
 		GetEnv("DB_PASSWORD", "postgres"),
 		GetEnv("DB_NAME", "bookmarkdb"),
-		GetEnv("DB_sslmode", "disable"),
+		GetEnv("DB_SSLMODE", "disable"),
 	)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		slog.Error("failed to connect to database", "error", err)
+		os.Exit(1)
 	}
-	log.Println("Database connected successfully")
+	slog.Info("database connected successfully")
 	return db
 }

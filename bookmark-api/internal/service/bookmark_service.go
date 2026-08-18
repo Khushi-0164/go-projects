@@ -2,14 +2,19 @@ package service
 
 import (
 	"bookmark-api/internal/models"
-	"bookmark-api/internal/repository"
 )
 
-type BookmarkService struct {
-	repo *repository.BookmarkRepository
+type BookmarkRepository interface {
+	Create(bookmark *models.Bookmark) error
+	FindAll(page, limit int, tag string) ([]models.Bookmark, int64, error)
+	Delete(id uint) error
 }
 
-func NewBookingService(repo *repository.BookmarkRepository) *BookmarkService {
+type BookmarkService struct {
+	repo BookmarkRepository
+}
+
+func NewBookmarkService(repo BookmarkRepository) *BookmarkService {
 	return &BookmarkService{repo: repo}
 }
 
