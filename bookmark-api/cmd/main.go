@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"bookmark-api/config"
-	"bookmark-api/internal/models"
 	"bookmark-api/internal/routes"
 
 	"github.com/joho/godotenv"
@@ -26,10 +25,10 @@ func main() {
 
 	db := config.ConnectDB()
 
-	if err := db.AutoMigrate(&models.Bookmark{}); err != nil {
-		slog.Error("failed to migrate database", "error", err)
-		os.Exit(1)
-	}
+	// if err := db.AutoMigrate(&models.Bookmark{}); err != nil {
+	// 	slog.Error("failed to migrate database", "error", err)
+	// 	os.Exit(1)
+	// }
 
 	router := routes.SetupRouter(db)
 	port := config.GetEnv("PORT", "8080")
@@ -39,8 +38,6 @@ func main() {
 		Handler: router,
 	}
 
-	// Run the server in its own goroutine so main() can continue on
-	// to wait for a shutdown signal.
 	go func() {
 		slog.Info("server starting", "port", port)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -49,7 +46,6 @@ func main() {
 		}
 	}()
 
-	// Block here until we receive an interrupt or termination signal.
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
