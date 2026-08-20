@@ -3,11 +3,14 @@ package routes
 import (
 	"net/http"
 	"newsletter-api/internal/handlers"
+	"newsletter-api/internal/middleware"
 	"newsletter-api/internal/repository"
 	"newsletter-api/internal/service"
 	"newsletter-api/internal/worker"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/time/rate"
 	"gorm.io/gorm"
 )
 
@@ -22,7 +25,7 @@ func SetupRouter(db *gorm.DB, pool *worker.Pool) *gin.Engine {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
-	router.POST("/subscribe", handler.Subscribe)
+	router.POST("/subscribe", middleware.RateLimit(rate.Every(2*time.Second), 3), handler.Subscribe)
 
 	return router
 }
