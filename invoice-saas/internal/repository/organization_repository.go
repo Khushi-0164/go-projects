@@ -27,6 +27,14 @@ func (r *OrganizationRepository) CreateWithOwner(org *models.Organization, owner
 		return tx.Create(&member).Error
 	})
 }
+func (r *OrganizationRepository) FindOrgsForUser(userID uint) ([]models.Organization, error) {
+	var orgs []models.Organization
+	err := r.DB.
+		Joins("JOIN org_members ON org_members.organization_id = organizations.id").
+		Where("org_members.user_id = ?", userID).
+		Find(&orgs).Error
+	return orgs, err
+}
 func (r *OrganizationRepository) FindMemberRole(orgID, userID uint) (models.OrgRole, bool) {
 	var member models.OrgMember
 	if err := r.DB.Where("organization_id = ? AND user_id = ?", orgID, userID).First(&member).Error; err != nil {
