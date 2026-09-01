@@ -31,6 +31,9 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	invoiceService := service.NewInvoiceService(invoiceRepo)
 	invoiceHandler := handlers.NewInvoiceHandler(invoiceService, orgRepo)
 
+	paymentService := service.NewPaymentService(invoiceRepo)
+	paymentHandler := handlers.NewPaymentHandler(paymentService, orgRepo)
+
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
@@ -56,6 +59,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	api.GET("/organizations/:id/invoices", invoiceHandler.ListInvoices)
 	api.GET("/organizations/:id/invoices/:invoiceId", invoiceHandler.GetInvoice)
 	api.PATCH("/organizations/:id/invoices/:invoiceId/status", invoiceHandler.UpdateStatus)
+	api.POST("/organizations/:id/invoices/:invoiceId/checkout", paymentHandler.CreateCheckoutSession)
 
 	return router
 }

@@ -20,6 +20,11 @@ func (r *InvoiceRepository) CreateWithLineItems(invoice *models.Invoice, lineIte
 			total += int64(item.Quantity) * item.UnitPriceCents
 		}
 		invoice.TotalCents = total
+
+		if err := tx.Create(invoice).Error; err != nil {
+			return err
+		}
+
 		for i := range lineItems {
 			lineItems[i].InvoiceID = invoice.ID
 		}
@@ -31,7 +36,6 @@ func (r *InvoiceRepository) CreateWithLineItems(invoice *models.Invoice, lineIte
 		return nil
 	})
 }
-
 func (r *InvoiceRepository) FindAll(orgID uint) ([]models.Invoice, error) {
 	var invoices []models.Invoice
 

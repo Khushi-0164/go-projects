@@ -8,6 +8,7 @@ import (
 	"invoice-saas/internal/routes"
 
 	"github.com/joho/godotenv"
+	"github.com/stripe/stripe-go/v79"
 )
 
 func main() {
@@ -17,6 +18,8 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		slog.Warn("no .env file found, relying on system environment variables")
 	}
+
+	stripe.Key = config.StripeSecretKey()
 
 	db := config.ConnectDB()
 
