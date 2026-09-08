@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"invoice-saas/internal/models"
 	"invoice-saas/internal/repository"
@@ -78,13 +79,29 @@ func (h *InvoiceHandler) ListInvoices(c *gin.Context) {
 		return
 	}
 
-	invoices, err := h.service.ListInvoices(orgID)
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil || page < 1 {
+		page = 1
+	}
+	limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	if err != nil || limit < 1 || limit > 100 {
+		limit = 10
+	}
+	status := c.Query("status")
+
+	invoices, total, err := h.service.ListInvoices(orgID, page, limit, status)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch invoices"})
 		return
 	}
 
-	c.JSON(http.StatusOK, invoices)
+	c.JSON(http.StatusOK, gin.H{
+		"data":        invoices,
+		"page":        page,
+		"limit":       limit,
+		"total":       total,
+		"total_pages": (total + int64(limit) - 1) / int64(limit),
+	})
 }
 
 func (h *InvoiceHandler) GetInvoice(c *gin.Context) {

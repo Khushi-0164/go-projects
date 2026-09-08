@@ -1,6 +1,8 @@
 package worker
 
 import (
+	"context"
+	"invoice-saas/internal/repository"
 	"log/slog"
 
 	"gorm.io/gorm"
@@ -13,14 +15,16 @@ type Job struct {
 }
 
 type Pool struct {
-	jobs chan Job
-	db   *gorm.DB
+	jobs    chan Job
+	db      *gorm.DB
+	summary *repository.CachedSummaryRepository
 }
 
-func NewPool(db *gorm.DB, numWorkers, queueSize int) *Pool {
+func NewPool(db *gorm.DB, summary *repository.CachedSummaryRepository, numWorkers, queueSize int) *Pool {
 	p := &Pool{
-		jobs: make(chan Job, queueSize),
-		db:   db,
+		jobs:    make(chan Job, queueSize),
+		db:      db,
+		summary: summary,
 	}
 
 	for i := 0; i < numWorkers; i++ {
@@ -46,6 +50,8 @@ func (p *Pool) startWorker(id int) {
 			slog.Error("failed to mark invoice as paid", "error", result.Error, "invoice_id", job.InvoiceID)
 			continue
 		}
+
+		p.summary.InvalidateSummary(context.Background(), job.OrgID)
 
 		slog.Info("invoice marked as paid", "worker_id", id, "invoice_id", job.InvoiceID)
 	}

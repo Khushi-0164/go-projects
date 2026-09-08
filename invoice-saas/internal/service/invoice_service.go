@@ -6,7 +6,7 @@ import (
 
 type InvoiceRepository interface {
 	CreateWithLineItems(invoice *models.Invoice, lineItems []models.InvoiceLineItem) error
-	FindAll(orgID uint) ([]models.Invoice, error)
+	FindAll(orgID uint, page, limit int, status string) ([]models.Invoice, int64, error)
 	FindByID(orgID, invoiceID uint) (*models.Invoice, error)
 	UpdateStatus(orgID, invoiceID uint, status models.InvoiceStatus) error
 }
@@ -47,8 +47,8 @@ func (s *InvoiceService) CreateInvoice(orgID, customerID uint, items []LineItemI
 	return invoice, nil
 }
 
-func (s *InvoiceService) ListInvoices(orgID uint) ([]models.Invoice, error) {
-	return s.repo.FindAll(orgID)
+func (s *InvoiceService) ListInvoices(orgID uint, page, limit int, status string) ([]models.Invoice, int64, error) {
+	return s.repo.FindAll(orgID, page, limit, status)
 }
 
 func (s *InvoiceService) GetInvoice(orgID, invoiceID uint) (*models.Invoice, error) {

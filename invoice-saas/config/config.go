@@ -1,10 +1,12 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"os"
 
+	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -45,4 +47,16 @@ func StripeSecretKey() string {
 
 func StripeWebhookSecret() string {
 	return GetEnv("STRIPE_WEBHOOK_SECRET", "")
+}
+func ConnectRedis() *redis.Client {
+	client := redis.NewClient(&redis.Options{
+		Addr: GetEnv("REDIS_ADDR", "localhost:6379"),
+	})
+
+	if err := client.Ping(context.Background()).Err(); err != nil {
+		slog.Error("failed to connect to redis", "error", err)
+		os.Exit(1)
+	}
+	slog.Info("redis connected successfully")
+	return client
 }

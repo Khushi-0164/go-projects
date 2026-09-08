@@ -138,14 +138,25 @@ func (f *fakeInvoiceRepository) CreateWithLineItems(invoice *models.Invoice, lin
 	return nil
 }
 
-func (f *fakeInvoiceRepository) FindAll(orgID uint) ([]models.Invoice, error) {
-	var result []models.Invoice
+func (f *fakeInvoiceRepository) FindAll(orgID uint, page, limit int, status string) ([]models.Invoice, int64, error) {
+	var filtered []models.Invoice
 	for _, inv := range f.invoices {
-		if inv.OrganizationID == orgID {
-			result = append(result, *inv)
+		if inv.OrganizationID == orgID && (status == "" || string(inv.Status) == status) {
+			filtered = append(filtered, *inv)
 		}
 	}
-	return result, nil
+
+	total := int64(len(filtered))
+	start := (page - 1) * limit
+	if start > len(filtered) {
+		return []models.Invoice{}, total, nil
+	}
+	end := start + limit
+	if end > len(filtered) {
+		end = len(filtered)
+	}
+
+	return filtered[start:end], total, nil
 }
 
 func (f *fakeInvoiceRepository) FindByID(orgID, invoiceID uint) (*models.Invoice, error) {
