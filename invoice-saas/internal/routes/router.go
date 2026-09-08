@@ -7,12 +7,13 @@ import (
 	"invoice-saas/internal/middleware"
 	"invoice-saas/internal/repository"
 	"invoice-saas/internal/service"
+	"invoice-saas/internal/worker"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-func SetupRouter(db *gorm.DB) *gin.Engine {
+func SetupRouter(db *gorm.DB, pool *worker.Pool) *gin.Engine {
 	router := gin.Default()
 
 	userRepo := repository.NewUserRepository(db)
@@ -38,6 +39,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
+	webhookHandler := handlers.NewWebhookHandler(pool)
+	router.POST("/webhooks/stripe", webhookHandler.StripeWebhook)
 	auth := router.Group("/auth")
 	{
 		auth.POST("/signup", authHandler.Signup)

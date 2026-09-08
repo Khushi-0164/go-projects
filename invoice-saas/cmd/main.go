@@ -6,6 +6,7 @@ import (
 
 	"invoice-saas/config"
 	"invoice-saas/internal/routes"
+	"invoice-saas/internal/worker"
 
 	"github.com/joho/godotenv"
 	"github.com/stripe/stripe-go/v79"
@@ -23,7 +24,8 @@ func main() {
 
 	db := config.ConnectDB()
 
-	router := routes.SetupRouter(db)
+	pool := worker.NewPool(db, 3, 100)
+	router := routes.SetupRouter(db, pool)
 
 	port := config.GetEnv("PORT", "8080")
 	slog.Info("server starting", "port", port)

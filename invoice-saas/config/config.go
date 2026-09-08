@@ -42,3 +42,7 @@ func JWTSecret() []byte {
 func StripeSecretKey() string {
 	return GetEnv("STRIPE_SECRET_KEY", "")
 }
+
+func StripeWebhookSecret() string {
+	return GetEnv("STRIPE_WEBHOOK_SECRET", "")
+}
